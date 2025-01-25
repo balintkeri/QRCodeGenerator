@@ -4,7 +4,7 @@ import wx
 
 class MyFrame(wx.Frame):
     def __init__(self, parent, title):
-        super(MyFrame, self).__init__(parent, title=title, size=(400, 400))
+        super(MyFrame, self).__init__(parent, title=title, size=(500, 500))
         
         self.panel          = wx.Panel(self)
         self.input          = wx.TextCtrl(self.panel, style = wx.TE_PROCESS_ENTER, value = "Your URL",)
