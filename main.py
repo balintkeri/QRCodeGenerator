@@ -7,7 +7,7 @@ class MyFrame(wx.Frame):
         super(MyFrame, self).__init__(parent, title=title, size=(400, 400))
         
         self.panel          = wx.Panel(self)
-        self.input          = wx.TextCtrl(self.panel, style = wx.TE_PROCESS_ENTER)
+        self.input          = wx.TextCtrl(self.panel, style = wx.TE_PROCESS_ENTER, value = "Your URL",)
         self.input.Bind(wx.EVT_TEXT_ENTER , self.on_generate)
         self.image_display  = wx.StaticBitmap(self.panel)
         self.generate_btn   =wx. Button(self.panel, label="Generate")
@@ -42,19 +42,21 @@ class MyFrame(wx.Frame):
     
     def on_generate(self, event):
         selected_text = self.input.GetValue()
-        img = createQRCode(selected_text)
+        if len(selected_text) > 0:
+            img = createQRCode(selected_text)
+            with wx.FileDialog(self, "Save XYZ file", wildcard="PNG image (*.png)|*.png", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
+                if fileDialog.ShowModal() == wx.ID_CANCEL:
+                    return
+                pathname = fileDialog.GetPath()
+                try:
+                    img.save(pathname)
+                    self.loadImg(pathname)
 
-        with wx.FileDialog(self, "Save XYZ file", wildcard="PNG image (*.png)|*.png", style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
-            if fileDialog.ShowModal() == wx.ID_CANCEL:
-                return
-            pathname = fileDialog.GetPath()
-            try:
-                img.save(pathname)
-                self.loadImg(pathname)
-
-                wx.MessageBox(f"The QR code of \"{selected_text}\" saved to {pathname}", "Info", wx.OK | wx.ICON_INFORMATION)
-            except IOError:
-                wx.MessageBox(f"Error during saving", "Error", wx.OK | wx.ICON_ERROR)
+                    wx.MessageBox(f"The QR code of \"{selected_text}\" saved to {pathname}", "Info", wx.OK | wx.ICON_INFORMATION)
+                except IOError:
+                    wx.MessageBox(f"Error during saving", "Error", wx.OK | wx.ICON_ERROR)
+        else:
+            wx.MessageBox(f"Empthy input", "Error", wx.OK | wx.ICON_ERROR)
 
 if __name__ == "__main__":
     app = wx.App()
